@@ -1,0 +1,60 @@
+inicializarAplicacion()
+# Inicializa la aplicación, configurando los parámetros y recursos necesario
+
+establecerClaveSecreta('supersecretkey')
+# Establece una clave secreta utilizada para la seguridad de la aplicación
+
+habilitarProteccionCSRF()
+# Habilita la protección contra ataques CSRF
+
+configurarAplicacion(
+    DEBUG=True,
+    SECRET_KEY='supersecretkey')
+# Configura la aplicación con parámetros específicos, como habilitar el modo de depuración (DEBUG) y establecer la clave secreta.
+
+inicializarLoginManager()
+# Inicializa el gestor de inicio de sesión, que maneja la autenticación de usuarios en la aplicación.
+
+usuarios = diccionarioVacio()
+# Crea un diccionario vacío para almacenar los usuarios registrados en la aplicación.
+
+funcion principal():
+    mostrarPagina('index.html')
+    # Muestra la página principal de la aplicación.
+
+funcion registrar():
+    username = obtenerFormulario('new_username')
+    password = obtenerFormulario('new_password')
+    # Obtiene el nombre de usuario y la contraseña del formulario de registro.
+
+    si username existe en usuarios:
+        mostrarMensaje('El usuario ya existe. Intenta con otro.')
+        # Verifica si el nombre de usuario ya existe en el diccionario de usuarios y muestra un mensaje si es así.
+
+    sino:
+        agregarUsuario(usuarios, username, password)
+        mostrarMensaje('Usuario registrado exitosamente. Ahora puedes hacer login.')
+        # Si el nombre de usuario no existe, lo agrega al diccionario de usuarios y muestra un mensaje de éxito.
+
+    redirigir('index')|
+    # Redirige al usuario a la página principal después del registro.
+
+funcion iniciarSesion():
+    username = obtenerFormulario('username')
+    password = obtenerFormulario('password')
+    # Obtiene el nombre de usuario y la contraseña del formulario de inicio de sesión.
+
+    si username existe en usuarios y usuarios[username] == password:
+        establecerSesion('username', username)
+        mostrarMensaje('¡Has iniciado sesión exitosamente!')
+        redirigir('dashboard')
+        # Verifica si el nombre de usuario existe y la contraseña es correcta, establece la sesión y redirige al panel de control.
+
+    sino:
+        mostrarMensaje('Usuario o contraseña incorrectos. Intenta nuevamente.')
+        redirigir('index')
+        # Si el nombre de usuario no existe o la contraseña es incorrecta, muestra un mensaje de error y redirige a la página principal.
+        
+si __nombre__ == '__main__':
+    ejecutarAplicacion(debug=True)
+    # Ejecuta la aplicación en modo de depuración si el script se ejecuta directamente.

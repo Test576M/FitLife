@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrador</title>
+</head>
+<body>
+    <h1>Universidad de Gran Rosario (Virtual)</h1>
+    <h2>Tecnicatura en Ciberseguridad</h2>
+    <h2>Matias Curti - Pablo Rodrigo Moya </h2>
+    <h3>Trabajo Integrador</h3>    
+    <!-- Formulario de Register -->
+    <form action='/register' method="POST" autocomplete="off">
+        <input type="text" name="new_username" placeholder="Nuevo Usuario">
+        <input type="password" name="new_password" placeholder="Contraseña">
+        <button type="submit" name="submit" value="register"> Registrar </button>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- En realidad como el template maneja flask esta ultima linea se puede simplificar como {{ form.csrf_token }} y listo-->
+    </form>
+    
+    <!-- Formulario de Login -->
+    <form action="/login" method="POST" autocomplete="off">
+        <input type="text" name="username" placeholder="Usuario">
+        <input type="password" name="password" placeholder="Contraseña">
+        <button type="submit" name="submit" value="register"> Iniciar Sesión </button>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- En realidad como el template maneja flask esta ultima linea se puede simplificar como {{ form.csrf_token }} al igual que el de register-->
+    </form>
+</body>
+</html>
+
