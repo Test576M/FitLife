@@ -1,7 +1,9 @@
 from sqlite4 import SQLite4
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, UserMixin, login_user
 from flask_wtf.csrf import CSRFProtect
+from flask_session import Session
+from datetime import timedelta
 import re 
 
 app = Flask(__name__)  #1 Crear una instancia de la aplicación Flask
@@ -11,7 +13,16 @@ csrf = CSRFProtect(app)  #1 Habilitar protección CSRF
 app.config.update(  #1 Configuración de la aplicación
     DEBUG=True,  #1 Es mala práctica dejar activado esto en producción.
     SECRET_KEY="supersecretkey",
+    SESSION_TYPE='sqlalchemy',  #3 Tipo de almacenamiento de sesión
+    SESSION_SQLALCHEMY=SQLite4("sessions.db"),  #3 Base de datos para almacenar sesiones
+    PERMANENT_SESSION_LIFETIME=timedelta(minutes=30)  #3 Duración de la sesión
+    SESSION_COOKIE_HTTPONLY=True  #3 Evita el acceso a la cookie desde JavaScript
 )
+
+
+#3 Inicializar Flask-Session - para que las cookies se trabajen
+#  en el servidor / backend - en este caso SQLite
+Session(app)
 
 #1 Inicializar el gestor de inicio de sesión
 login_manager = LoginManager()
@@ -115,7 +126,9 @@ def login():
     user = database.fetchone()
     if user:
         user_obj = User(username=user[0], password=user[1])
+        session.clear() #3 Regenerar la ID de session para mitigar session fixation
         login_user(user_obj)
+        session.permanent = True  #3 Marcar la sesión como permanente
         flash('¡Has iniciado sesión exitosamente!')
         return redirect(url_for('dashboard'))
     else:
@@ -125,3 +138,11 @@ def login():
 if __name__ == '__main__':
     app.run(debug=True)
     #1 Ejecuta la aplicación en modo de depuración si el script se ejecuta directamente.
+
+#3 voy a colocar un ejemplo de como podría mitigarse el riesgo a recibir un ataque session hijacking:
+#3 en app.config.update (SESSION_COOKIE_SECURE=True) -- esto hace que las cookies solo se envien a travez de HTTPS 
+#3 if __name__ == '__main__':  
+#3 app.run(ssl_context=('path/to/cert.pem', 'path/to/key.pem'), debug=True)
+#3 Aca lo que se busca es especificar los archivos de certificado y la clave, cosa con la que no cuento, pero es una opción viable a plantear.
+
+
